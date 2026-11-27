@@ -1,0 +1,4 @@
+Modelo,F1 (CV),Desvio,Melhores hiperparâmetros
+Regressão Logística,0.6212743521893245,0.022550842097708444,"{'C': 0.01, 'class_weight': 'balanced'}"
+Random Forest,0.6319732726206972,0.020584055700114914,"{'class_weight': 'balanced', 'max_depth': 10, 'min_samples_leaf': 5, 'n_estimators': 400}"
+SVM,0.6207488390112048,0.023058136144004922,"{'C': 0.1, 'class_weight': 'balanced', 'kernel': 'rbf'}"
