@@ -1,63 +1,229 @@
-# Previsão de Churn em Telecomunicações
+```text
+ ██████╗██╗  ██╗██╗   ██╗██████╗ ███╗   ██╗
+██╔════╝██║  ██║██║   ██║██╔══██╗████╗  ██║
+██║     ███████║██║   ██║██████╔╝██╔██╗ ██║
+██║     ██╔══██║██║   ██║██╔══██╗██║╚██╗██║
+╚██████╗██║  ██║╚██████╔╝██║  ██║██║ ╚████║
+ ╚═════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝
+```
 
-Trabalho de Machine Learning, Unidade 3.
-Integrantes: Karoline Costa e Gabriel Sad
+<div align="center">
 
-## 1. Problema
-Classificação binária: prever se um cliente vai cancelar o serviço (*churn*). Reter clientes costuma custar menos que conquistar novos, e a previsão permite agir antes do cancelamento.
+# 📡 PREVISÃO DE CHURN EM TELECOMUNICAÇÕES v1.0 📡
 
-## 2. Dados
-Base pública **Telco Customer Churn** (Kaggle), em CSV. Cada linha é um cliente, com dados demográficos, serviços contratados, tipo de contrato, forma de pagamento, tempo de casa (`tenure`), valores cobrados e o alvo `Churn`.
+***MACHINE LEARNING A SERVIÇO DA RETENÇÃO DE CLIENTES!***
 
-## 3. Pré-processamento
-- Conversão de `TotalCharges` para número; total 0 para clientes com `tenure = 0` sem valor.
-- Remoção de duplicatas e de `customerID`.
-- Numéricas: imputação pela mediana e padronização.
-- Categóricas: imputação pela moda e one-hot encoding.
-- Transformações dentro de um `Pipeline`, ajustadas só no treino (sem vazamento).
+👩‍💻 **Karoline Costa** · 👨‍💻 **Gabriel Sad** · 🎓 Machine Learning, Unidade 3
 
-## 4. Divisão dos dados
-Estratificada, semente 42: 60% treino, 20% validação, 20% teste.
+</div>
 
-## 5. Modelagem
-Regressão Logística, Random Forest e SVM, com `GridSearchCV` (5 dobras estratificadas, métrica F1). Um classificador trivial serve de referência. O limiar de decisão e o modelo final são escolhidos na validação.
 
-## 6. Avaliação
-Acurácia, precisão, recall, F1, ROC-AUC e PR-AUC no teste, com matrizes de confusão, curvas ROC e precisão-recall e importância por permutação. A acurácia sozinha engana quando as classes são desbalanceadas, por isso priorizamos recall e F1.
+---
 
-## 7. Resultados e discussão
-Conjunto de teste (1.409 clientes, 374 cancelamentos), com limiar ajustado na validação:
+<h2 align="center">🔍 VISÃO GERAL DO SISTEMA 🔍</h2>
+
+
+```text
+╔═══════════════════════════════════════════════════════════════╗
+║  Este projeto prevê se um cliente de telecomunicações vai     ║
+║  CANCELAR o serviço (churn). É uma classificação binária!     ║
+║                                                               ║
+║  Reter um cliente costuma custar menos que conquistar outro,  ║
+║  então identificar o risco permite AGIR ANTES.                ║
+╚═══════════════════════════════════════════════════════════════╝
+```
+
+---
+
+<h2 align="center">💾 BASE DE DADOS 💾</h2>
+
+
+Base pública **Telco Customer Churn** (Kaggle), em CSV.
+
+| 📋 ITEM | 🔢 VALOR |
+|---|---|
+| Clientes | 7.043 |
+| Variáveis preditoras | 19 (perfil, serviços, contrato e cobrança) |
+| Alvo | `Churn` (Yes/No) |
+| Cancelamentos | 26,5% (classes desbalanceadas) |
+
+
+---
+
+<h2 align="center">⚙️ COMO FUNCIONA ⚙️</h2>
+
+
+```text
+┌───────────────────────────┐
+│     CARREGAR OS DADOS     │
+└─────────────┬─────────────┘
+              ▼
+┌───────────────────────────┐
+│     LIMPAR E CODIFICAR    │
+└─────────────┬─────────────┘
+              ▼
+┌───────────────────────────┐
+│    DIVIDIR 60 / 20 / 20   │
+└─────────────┬─────────────┘
+              ▼
+┌───────────────────────────┐
+│  TREINAR COM GRID SEARCH  │
+└─────────────┬─────────────┘
+              ▼
+┌───────────────────────────┐
+│   ESCOLHER NA VALIDACAO   │
+└─────────────┬─────────────┘
+              ▼
+┌───────────────────────────┐
+│      AVALIAR NO TESTE     │
+└───────────────────────────┘
+```
+
+---
+
+<h2 align="center">🧹 PRÉ-PROCESSAMENTO 🧹</h2>
+
+
+```text
+┌───────────────────────────────────────────────────────────────┐
+│  [x] TotalCharges convertido em número (0 quando tenure = 0)  │
+│  [x] Remoção de duplicatas e de customerID                    │
+│  [x] Numéricas: mediana + StandardScaler                      │
+│  [x] Categóricas: moda + one-hot encoding                     │
+│  [x] Tudo em Pipeline, ajustado só no treino (sem vazamento)  │
+└───────────────────────────────────────────────────────────────┘
+```
+
+
+Divisão estratificada (semente 42): **4.225** no treino, **1.409** na validação e **1.409** no teste.
+
+
+---
+
+<h2 align="center">🧠 MODELOS EM AÇÃO 🧠</h2>
+
+
+`GridSearchCV` com 5 dobras estratificadas, otimizando F1. Um classificador trivial serve de referência.
+
+| 🤖 MODELO | 🎛️ MELHORES HIPERPARÂMETROS | 📈 F1 (CV) |
+|---|---|---|
+| Regressão Logística | C = 0,01; pesos balanceados | 0,621 |
+| Random Forest | 400 árvores; profundidade 10; folha mínima 5; balanceado | 0,632 |
+| SVM | C = 0,1; kernel RBF; pesos balanceados | 0,621 |
+
+O limiar de decisão e o modelo final são escolhidos na validação.
+
+
+---
+
+<h2 align="center">🏆 RESULTADOS NO TESTE 🏆</h2>
+
+
+1.409 clientes, 374 cancelamentos, com limiar ajustado na validação:
 
 | Modelo | Acurácia | Precisão | Recall | F1 | ROC-AUC | PR-AUC |
 |---|---|---|---|---|---|---|
 | Referência (sempre "Não") | 0,735 | 0,000 | 0,000 | 0,000 | 0,500 | 0,265 |
 | Regressão Logística | 0,779 | 0,578 | 0,626 | 0,601 | 0,830 | 0,621 |
-| **Random Forest (escolhido)** | 0,749 | 0,518 | 0,789 | 0,625 | 0,830 | 0,629 |
+| ⭐ **Random Forest** | **0,749** | **0,518** | **0,789** | **0,625** | **0,830** | **0,629** |
 | SVM | 0,772 | 0,561 | 0,650 | 0,602 | 0,820 | 0,586 |
 
-- O Random Forest identificou 295 dos 374 cancelamentos (79 não detectados), com 275 alarmes falsos.
+
+```text
+╔═══════════════════════════════════════════════════╗
+║  RANDOM FOREST (escolhido na validação)           ║
+║                                                   ║
+║  Cancelamentos detectados ..... 295 de 374 (79%)  ║
+║  Cancelamentos não detectados .. 79               ║
+║  Alarmes falsos ............... 275               ║
+╚═══════════════════════════════════════════════════╝
+```
+
+---
+
+<h2 align="center">💬 DISCUSSÃO 💬</h2>
+
+
 - Os três modelos têm desempenho muito próximo. No limiar padrão, a Regressão Logística teve F1 0,623 e recall 0,805, praticamente empatada com o Random Forest.
-- O ajuste de limiar feito na validação não melhorou o F1 no teste da Regressão Logística (0,623 para 0,601) nem do SVM (0,618 para 0,602).
-- A referência trivial tem 73,5% de acurácia sem detectar nenhum cancelamento, o que mostra por que a acurácia não basta.
+- O ajuste de limiar não melhorou o F1 no teste da Regressão Logística (0,623 para 0,601) nem do SVM (0,618 para 0,602).
+- A referência trivial acerta 73,5% sem detectar nenhum cancelamento: a acurácia sozinha engana.
 - Variáveis mais importantes (permutação): `Contract` (de longe), `InternetService`, `TotalCharges`, `tenure` e `TechSupport`. Importância não implica causalidade.
 
-## 8. Como reproduzir
-**Google Colab**
+
+<div align="center">
+
+<img src="figuras/05_matrizes_confusao.png" alt="Matrizes de confusão" width="90%">
+
+<img src="figuras/07_importancia.png" alt="Importância das variáveis" width="70%">
+
+</div>
+
+
+---
+
+<h2 align="center">🚀 CONCLUSÕES E PRÓXIMAS FASES 🚀</h2>
+
+
+O **Random Forest** foi o escolhido, e a **Regressão Logística** é uma alternativa mais simples. O contrato mensal concentra o risco (43,1% de churn no treino, contra 2,9% no bienal).
+
+
+```text
+┌────────────────────────────────────────────────────────┐
+│  > Testar Gradient Boosting e redes neurais            │
+│  > Criar novas variáveis e testar SMOTE                │
+│  > Definir o limiar pelo custo de cada erro            │
+│  > Calibrar probabilidades e usar dados mais recentes  │
+└────────────────────────────────────────────────────────┘
+```
+
+---
+
+<h2 align="center">🎮 COMO REPRODUZIR 🎮</h2>
+
+
+### ☁️ Google Colab
 1. Abra `churn_telco.ipynb`.
-2. Use *Ambiente de execução > Executar tudo*.
+2. Clique em **Ambiente de execução > Executar tudo**.
 3. Quando solicitado, envie o ZIP ou CSV da base.
 
-**Localmente**
+### 💻 No seu computador
 ```bash
 pip install -r requirements.txt
 # o ZIP ou CSV da base deve estar nesta pasta
 jupyter notebook churn_telco.ipynb
 ```
 
-## 9. Estrutura
+
+---
+
+<h2 align="center">📁 ARQUIVOS DO PROJETO 📁</h2>
+
+
+```text
+.
+├── churn_telco.ipynb    código completo
+├── requirements.txt     dependências
+├── README.md            este guia
+├── figuras/             gráficos gerados
+└── resultados/          tabelas em CSV
 ```
-churn_telco.ipynb   código completo
-requirements.txt    dependências
-figuras/            gráficos (gerados na execução)
-resultados/         tabelas em CSV (geradas na execução)
+
+
+---
+
+
+```text
+╔════════════════════════════════════════════════════════╗
+║  OBRIGADO por visitar o nosso PREVISOR DE CHURN v1.0!  ║
+║  Que nenhum cliente saia sem ser notado!               ║
+╚════════════════════════════════════════════════════════╝
+```
+
+```text
+███████╗██╗███╗   ███╗
+██╔════╝██║████╗ ████║
+█████╗  ██║██╔████╔██║
+██╔══╝  ██║██║╚██╔╝██║
+██║     ██║██║ ╚═╝ ██║
+╚═╝     ╚═╝╚═╝     ╚═╝
 ```
