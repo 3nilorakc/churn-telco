@@ -152,9 +152,9 @@ O limiar de decisão e o modelo final são escolhidos na validação.
 
 <div align="center">
 
-<img src="05_matrizes_confusao.png" alt="Matrizes de confusão" width="90%">
+<img src="/figuras/05_matrizes_confusao.png" alt="Matrizes de confusão" width="90%">
 
-<img src="07_importancia.png" alt="Importância das variáveis" width="70%">
+<img src="/figuras/07_importancia.png" alt="Importância das variáveis" width="70%">
 
 </div>
 
